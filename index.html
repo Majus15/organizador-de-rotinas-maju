@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronos 3D - Organizador de Rotinas</title>
+    <!-- Font Awesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ==========================================
+           RESET & ESTILOS GLOBAIS
+        ========================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #020617;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ==========================================
+           ESTRELAS VOANDO EM 3D (3 Tons de Azul)
+        ========================================== */
+        .space-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #0f172a 0%, #030712 60%, #000000 100%);
+            perspective: 800px;
+            overflow: hidden;
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Camada 1: Azul Claríssimo / Turquesa */
+        .stars-front {
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #38bdf8, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 150px 150px, #38bdf8, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 300px 80px, #0ea5e9, rgba(0,0,0,0)),
+                radial-gradient(3px 3px at 450px 350px, #38bdf8, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 600px 200px, #7dd3fc, rgba(0,0,0,0));
+            background-size: 550px 550px;
+            animation: flyStars 8s linear infinite;
+            opacity: 0.9;
+        }
+
+        /* Camada 2: Azul Royal */
+        .stars-mid {
+            background-image: 
+                radial-gradient(2px 2px at 50px 100px, #2563eb, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 250px 400px, #3b82f6, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 500px 120px, #2563eb, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 700px 300px, #60a5fa, rgba(0,0,0,0));
+            background-size: 400px 400px;
+            animation: flyStars 14s linear infinite;
+            opacity: 0.7;
+        }
+
+        /* Camada 3: Azul Profundo */
+        .stars-back {
+            background-image: 
+                radial-gradient(1.5px 1.5px at 80px 220px, #1d4ed8, rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 180px 50px, #1e40af, rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 340px 300px, #1d4ed8, rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 620px 480px, #1e3a8a, rgba(0,0,0,0));
+            background-size: 300px 300px;
+            animation: flyStars 22s linear infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes flyStars {
+            0% { transform: translateZ(-200px) scale(0.8); }
+            100% { transform: translateZ(500px) scale(2.2); }
+        }
+
+        /* ==========================================
+           CONTAINERS & CONTROLE DE VISIBILIDADE
+        ========================================== */
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-view {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .page-view.active-page {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .logo-3d {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #38bdf8 0%, #2563eb 50%, #1e40af 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+            transform: perspective(500px) rotateX(10deg);
+        }
+
+        .logo-3d span {
+            color: #38bdf8;
+            -webkit-text-fill-color: #38bdf8;
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.8);
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            margin-top: 5px;
+        }
+
+        /* Grid & Cards 3D */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+            perspective: 1000px;
+        }
+
+        .card-3d {
+            background: rgba(15, 23, 42, 0.65);
+            border-radius: 20px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 
+                        0 0 15px rgba(37, 99, 235, 0.15);
+            backdrop-filter: blur(12px);
+            transition: transform 0.1s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
+            cursor: pointer;
+            transform-style: preserve-3d;
+        }
+
+        .card-3d:hover {
+            border-color: rgba(56, 189, 248, 0.6);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 
+                        0 0 30px rgba(56, 189, 248, 0.35);
+        }
+
+        .card-glass {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            color: #38bdf8;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+            transform: translateZ(30px);
+        }
+
+        .card-glass h2 {
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+            color: #f8fafc;
+            transform: translateZ(25px);
+        }
+
+        .card-glass p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            flex-grow: 1;
+            transform: translateZ(20px);
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transform: translateZ(25px);
+        }
+
+        .badge {
+            background: linear-gradient(135deg, #1e40af, #2563eb);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #e0f2fe;
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
+        }
+
+        .card-btn {
+            color: #38bdf8;
+            background: none;
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .card-btn:hover {
+            color: #7dd3fc;
+            transform: translateX(4px);
+        }
+
+        /* ==========================================
+           MODAIS TRIDIMENSIONAIS
+        ========================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content-3d {
+            background: linear-gradient(145deg, #0f172a, #030712);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            padding: 35px;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9), 
+                        0 0 40px rgba(37, 99, 235, 0.3);
+            transform: scale(0.7) rotateX(20deg);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.active .modal-content-3d {
+            transform: scale(1) rotateX(0deg);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #38bdf8;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-icon {
+            font-size: 2rem;
+            color: #38bdf8;
+        }
+
+        .modal-header h2 {
+            font-size: 1.8rem;
+            color: #f8fafc;
+        }
+
+        .modal-body h3 {
+            font-size: 1.1rem;
+            color: #38bdf8;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .modal-body ul {
+            list-style: none;
+            margin-bottom: 15px;
+        }
+
+        .modal-body li {
+            color: #cbd5e1;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .modal-body li i {
+            color: #38bdf8;
+            margin-right: 8px;
+        }
+
+        .modal-body p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            margin-top: 25px;
+            text-align: right;
+        }
+
+        .modal-link-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .modal-link-btn:hover {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            transform: translateY(-2px);
+        }
+
+        /* ==========================================
+           PÁGINAS DETALHADAS (SUBPÁGINAS)
+        ========================================== */
+        .subpage-card {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 40px;
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 24px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #38bdf8;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fundo de Estrelas 3D -->
+    <div class="space-container">
+        <div class="stars stars-back"></div>
+        <div class="stars stars-mid"></div>
+        <div class="stars stars-front"></div>
+    </div>
+
+    <!-- Container Principal da Aplicação -->
+    <div class="app-container">
+
+        <!-- ==================== PÁGINA PRINCIPAL ==================== -->
+        <div id="page-home" class="page-view active-page">
+            <header class="header">
+                <h1 class="logo-3d">CHRONOS <span>3D</span></h1>
+                <p class="subtitle">Gestão Inteligente de Tempo & Rotinas</p>
+            </header>
+
+            <main class="cards-grid">
+
+                <!-- Card: Estudo -->
+                <div class="card-3d" onclick="openModal('modal-estudo')">
+                    <div class="card-glass">
+                        <div class="card-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <h2>Estudo</h2>
+                        <p>Foco, aprendizado contínuo e desenvolvimento técnico.</p>
+                        <div class="card-footer">
+                            <span class="badge">6h / dia (5x/sem)</span>
+                            <button class="card-btn" onclick="event.stopPropagation(); navigateTo('page-estudo')">
+                                Detalhes <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Trabalho -->
+                <div class="card-3d" onclick="openModal('modal-trabalho')">
+                    <div class="card-glass">
+                        <div class="card-icon"><i class="fa-solid fa-briefcase"></i></div>
+                        <h2>Trabalho</h2>
+                        <p>Projetos, entregas, metas diárias e produtividade.</p>
+                        <div class="card-footer">
+                            <span class="badge">4h / dia (5x/sem)</span>
+                            <button class="card-btn" onclick="event.stopPropagation(); navigateTo('page-trabalho')">
+                                Detalhes <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Lazer -->
+                <div class="card-3d" onclick="openModal('modal-lazer')">
+                    <div class="card-glass">
+                        <div class="card-icon"><i class="fa-solid fa-gamepad"></i></div>
+                        <h2>Lazer</h2>
+                        <p>Desconexão, entretenimento e momentos de descanso.</p>
+                        <div class="card-footer">
+                            <span class="badge">2h / dia</span>
+                            <button class="card-btn" onclick="event.stopPropagation(); navigateTo('page-lazer')">
+                                Detalhes <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Hobby -->
+                <div class="card-3d" onclick="openModal('modal-hobby')">
+                    <div class="card-glass">
+                        <div class="card-icon"><i class="fa-solid fa-palette"></i></div>
+                        <h2>Hobby</h2>
+                        <p>Criatividade, paixões pessoais e prática livre.</p>
+                        <div class="card-footer">
+                            <span class="badge">1.5h / dia</span>
+                            <button class="card-btn" onclick="event.stopPropagation(); navigateTo('page-hobby')">
+                                Detalhes <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+
+
+        <!-- ==================== DETALHES: ESTUDO ==================== -->
+        <div id="page-estudo" class="page-view">
+            <div class="subpage-card">
+                <button class="back-btn" onclick="navigateTo('page-home')">
+                    <i class="fa-solid fa-arrow-left"></i> Voltar ao Painel
+                </button>
+                <div class="modal-header">
+                    <i class="fa-solid fa-graduation-cap modal-icon"></i>
+                    <h2>Plano Detalhado de Estudos</h2>
+                </div>
+                <div class="modal-body" style="margin-top: 20px;">
+                    <h3>Frequência: 5 dias por semana (6 horas / dia) - Total: 30h/semana</h3>
+                    <ul>
+                        <li><i class="fa-solid fa-clock"></i> <strong>08:00 - 11:00 (3h):</strong> Leitura técnica, teoria e conceitos fundamentais.</li>
+                        <li><i class="fa-solid fa-laptop-code"></i> <strong>14:00 - 17:00 (3h):</strong> Resolução de exercícios, programação prática e projetos.</li>
+                        <li><i class="fa-solid fa-calendar-days"></i> <strong>Dias de Estudo:</strong> Segunda a Sexta-feira.</li>
+                        <li><i class="fa-solid fa-bed"></i> <strong>Sábado e Domingo:</strong> Descanso e recuperação.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ==================== DETALHES: TRABALHO ==================== -->
+        <div id="page-trabalho" class="page-view">
+            <div class="subpage-card">
+                <button class="back-btn" onclick="navigateTo('page-home')">
+                    <i class="fa-solid fa-arrow-left"></i> Voltar ao Painel
+                </button>
+                <div class="modal-header">
+                    <i class="fa-solid fa-briefcase modal-icon"></i>
+                    <h2>Gestão de Trabalho</h2>
+                </div>
+                <div class="modal-body" style="margin-top: 20px;">
+                    <h3>Frequência: 5 dias por semana (4 horas / dia) - Total: 20h/semana</h3>
+                    <ul>
+                        <li><i class="fa-solid fa-envelope"></i> <strong>11:00 - 12:00 (1h):</strong> Checagem de e-mails, alinhamentos e reuniões rápidas.</li>
+                        <li><i class="fa-solid fa-code"></i> <strong>17:00 - 20:00 (3h):</strong> Foco contínuo nas tarefas prioritárias e desenvolvimento.</li>
+                        <li><i class="fa-solid fa-calendar-check"></i> <strong>Dias de Trabalho:</strong> Segunda a Sexta-feira.</li>
+                        <li><i class="fa-solid fa-flag"></i> <strong>Foco:</strong> Máxima eficiência em turnos reduzidos de 4 horas diárias.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ==================== DETALHES: LAZER ==================== -->
+        <div id="page-lazer" class="page-view">
+            <div class="subpage-card">
+                <button class="back-btn" onclick="navigateTo('page-home')">
+                    <i class="fa-solid fa-arrow-left"></i> Voltar ao Painel
+                </button>
+                <div class="modal-header">
+                    <i class="fa-solid fa-gamepad modal-icon"></i>
+                    <h2>Momentos de Lazer</h2>
+                </div>
+                <div class="modal-body" style="margin-top: 20px;">
+                    <h3>Atividades de Descanso (2h / dia)</h3>
+                    <ul>
+                        <li><i class="fa-solid fa-tv"></i> <strong>Filmes & Séries:</strong> 1 hora por noite.</li>
+                        <li><i class="fa-solid fa-gamepad"></i> <strong>Gaming:</strong> Sessões curtas ao fim do dia.</li>
+                        <li><i class="fa-solid fa-tree"></i> <strong>Ar Livre:</strong> Caminhadas e momentos off-line aos finais de semana.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ==================== DETALHES: HOBBY ==================== -->
+        <div id="page-hobby" class="page-view">
+            <div class="subpage-card">
+                <button class="back-btn" onclick="navigateTo('page-home')">
+                    <i class="fa-solid fa-arrow-left"></i> Voltar ao Painel
+                </button>
+                <div class="modal-header">
+                    <i class="fa-solid fa-palette modal-icon"></i>
+                    <h2>Projetos Pessoais & Hobbies</h2>
+                </div>
+                <div class="modal-body" style="margin-top: 20px;">
+                    <h3>Atividades Criativas (1.5h / dia)</h3>
+                    <ul>
+                        <li><i class="fa-solid fa-music"></i> <strong>Música:</strong> Prática de instrumentos musicais.</li>
+                        <li><i class="fa-solid fa-paintbrush"></i> <strong>Design/Arte:</strong> Experimentos visuais e modelagem 3D.</li>
+                        <li><i class="fa-solid fa-book"></i> <strong>Leitura:</strong> Livros de ficção e temas de interesse pessoal.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ==================== MODAIS DE INFORMAÇÕES ==================== -->
+
+    <!-- Modal Estudo -->
+    <div id="modal-estudo" class="modal-overlay" onclick="closeModal(event, 'modal-estudo')">
+        <div class="modal-content-3d">
+            <button class="close-btn" onclick="closeModalDirect('modal-estudo')">&times;</button>
+            <div class="modal-header">
+                <i class="fa-solid fa-graduation-cap modal-icon"></i>
+                <h2>Rotina de Estudo</h2>
+            </div>
+            <div class="modal-body">
+                <h3>Carga Horária: 6h / dia (5x/semana)</h3>
+                <ul>
+                    <li><i class="fa-solid fa-check"></i> <strong>08:00 - 11:00:</strong> Bloco Manhã (Foco Total & Teoria)</li>
+                    <li><i class="fa-solid fa-check"></i> <strong>14:00 - 17:00:</strong> Bloco Tarde (Prática & Projetos)</li>
+                </ul>
+                <h3>Objetivo Semanal</h3>
+                <p>30 horas semanais dedicadas ao aprendizado profundo e consolidação de conteúdo.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-link-btn" onclick="closeModalDirect('modal-estudo'); navigateTo('page-estudo')">
+                    Ver Plano Completo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Trabalho -->
+    <div id="modal-trabalho" class="modal-overlay" onclick="closeModal(event, 'modal-trabalho')">
+        <div class="modal-content-3d">
+            <button class="close-btn" onclick="closeModalDirect('modal-trabalho')">&times;</button>
+            <div class="modal-header">
+                <i class="fa-solid fa-briefcase modal-icon"></i>
+                <h2>Rotina de Trabalho</h2>
+            </div>
+            <div class="modal-body">
+                <h3>Carga Horária: 4h / dia (5x/semana)</h3>
+                <ul>
+                    <li><i class="fa-solid fa-check"></i> Resposta a e-mails, reuniões e alinhamentos</li>
+                    <li><i class="fa-solid fa-check"></i> Execução de demandas prioritárias da Sprint</li>
+                    <li><i class="fa-solid fa-check"></i> Entregas e revisão diária</li>
+                </ul>
+                <h3>Meta Semanal</h3>
+                <p>20 horas semanais de alta produtividade e entregas objetivas.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-link-btn" onclick="closeModalDirect('modal-trabalho'); navigateTo('page-trabalho')">
+                    Ver Plano Completo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Lazer -->
+    <div id="modal-lazer" class="modal-overlay" onclick="closeModal(event, 'modal-lazer')">
+        <div class="modal-content-3d">
+            <button class="close-btn" onclick="closeModalDirect('modal-lazer')">&times;</button>
+            <div class="modal-header">
+                <i class="fa-solid fa-gamepad modal-icon"></i>
+                <h2>Rotina de Lazer</h2>
+            </div>
+            <div class="modal-body">
+                <h3>Atividades Programadas</h3>
+                <ul>
+                    <li><i class="fa-solid fa-check"></i> Jogos multiplayer ou campanhas solo</li>
+                    <li><i class="fa-solid fa-check"></i> Assistir séries/filmes favoritos</li>
+                    <li><i class="fa-solid fa-check"></i> Caminhadas e atividades ao ar livre</li>
+                </ul>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-link-btn" onclick="closeModalDirect('modal-lazer'); navigateTo('page-lazer')">
+                    Ver Plano Completo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Hobby -->
+    <div id="modal-hobby" class="modal-overlay" onclick="closeModal(event, 'modal-hobby')">
+        <div class="modal-content-3d">
+            <button class="close-btn" onclick="closeModalDirect('modal-hobby')">&times;</button>
+            <div class="modal-header">
+                <i class="fa-solid fa-palette modal-icon"></i>
+                <h2>Rotina de Hobby</h2>
+            </div>
+            <div class="modal-body">
+                <h3>Projetos Pessoais</h3>
+                <ul>
+                    <li><i class="fa-solid fa-check"></i> Prática de instrumentos musicais</li>
+                    <li><i class="fa-solid fa-check"></i> Arte digital / modelagem 3D</li>
+                    <li><i class="fa-solid fa-check"></i> Leitura de ficção e fantasia</li>
+                </ul>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-link-btn" onclick="closeModalDirect('modal-hobby'); navigateTo('page-hobby')">
+                    Ver Plano Completo
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // Navegação entre Telas (Single Page Application)
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page-view').forEach(page => {
+                page.classList.remove('active-page');
+            });
+
+            const targetPage = document.getElementById(pageId);
+            if(targetPage) {
+                targetPage.classList.add('active-page');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Controle dos Modais
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if(modal) {
+                modal.classList.add('active');
+            }
+        }
+
+        function closeModal(event, id) {
+            if(event.target.classList.contains('modal-overlay')) {
+                const modal = document.getElementById(id);
+                if(modal) modal.classList.remove('active');
+            }
+        }
+
+        function closeModalDirect(id) {
+            const modal = document.getElementById(id);
+            if(modal) modal.classList.remove('active');
+        }
+
+        // Efeito Tilt 3D nos Cards ao mover o mouse
+        document.querySelectorAll('.card-3d').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = ((y - centerY) / centerY) * -12;
+                const rotateY = ((x - centerX) / centerX) * 12;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)`;
+            });
+        });
+    </script>
+</body>
+</html>
