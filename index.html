@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronos 3D - Organizador de Rotinas</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Fundo de Estrelas 3D -->
+    <div class="space-container">
+        <div class="stars stars-back"></div>
+        <div class="stars stars-mid"></div>
+        <div class="stars stars-front"></div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="app-container">
+        <header class="header">
+            <h1 class="logo-3d">CHRONOS <span>3D</span></h1>
+            <p class="subtitle">Gestão Inteligente de Tempo & Rotinas</p>
+        </header>
+
+        <!-- Grid de Cards de Rotina -->
+        <main class="cards-grid">
+
+            <!-- Card: Estudo -->
+            <div class="card-3d" onclick="openModal('modal-estudo')">
+                <div class="card-glass">
+                    <div class="card-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <h2>Estudo</h2>
+                    <p>Foco, aprendizado contínuo e desenvolvimento técnico.</p>
+                    <div class="card-footer">
+                        <span class="badge">4h / dia</span>
+                        <a href="estudo.html" class="card-btn" onclick="event.stopPropagation()">Acessar <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Trabalho -->
+            <div class="card-3d" onclick="openModal('modal-trabalho')">
+                <div class="card-glass">
+                    <div class="card-icon"><i class="fa-solid fa-briefcase"></i></div>
+                    <h2>Trabalho</h2>
+                    <p>Projetos, entregas, metas diárias e produtividade.</p>
+                    <div class="card-footer">
+                        <span class="badge">8h / dia</span>
+                        <a href="trabalho.html" class="card-btn" onclick="event.stopPropagation()">Acessar <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Lazer -->
+            <div class="card-3d" onclick="openModal('modal-lazer')">
+                <div class="card-glass">
+                    <div class="card-icon"><i class="fa-solid fa-gamepad"></i></div>
+                    <h2>Lazer</h2>
+                    <p>Desconexão, entretenimento e momentos de descanso.</p>
+                    <div class="card-footer">
+                        <span class="badge">2h / dia</span>
+                        <a href="lazer.html" class="card-btn" onclick="event.stopPropagation()">Acessar <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Hobby -->
+            <div class="card-3d" onclick="openModal('modal-hobby')">
+                <div class="card-glass">
+                    <div class="card-icon"><i class="fa-solid fa-palette"></i></div>
+                    <h2>Hobby</h2>
+                    <p>Criatividade, paixões pessoais e prática livre.</p>
+                    <div class="card-footer">
+                        <span class="badge">1.5h / dia</span>
+                        <a href="hobby.html" class="card-btn" onclick="event.stopPropagation()">Acessar <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modais de Detalhes -->
+    
+    <!-- Modal Estudo -->
+    <div id="modal-estudo" class="modal-overlay" onclick="closeModal(event, 'modal-estudo')">
+        <div class="modal-content-3d">
+            <button class="close-btn" onclick="closeModalDirect('modal-estudo')">&times;</button>
+            <div class="modal-header">
+                <i class="fa-solid fa-graduation-cap modal-icon"></i>
+                <h2>Rotina de Estudo</h2>
+            </div>
+            <div class="modal-body">
+                <h3>Horários & Foco</h3>
+                <ul>
+                    <li><i class="fa-solid fa-check"></i> <strong>08:00 - 10:00:</strong> Programação e Estruturas de Dados</li>
+                    <li><i class="fa-solid fa-check"></i> <strong>14:00 - 16:00:</strong> Leitura Técnica & Documentações</li>
+                </ul>
+                <h3>Objetivo da Semana</h3>
+                <p>Dominar layouts 3D e animações avançadas em CSS3.</p>
+            </div>
+            <div class="modal-actions">
+                <a href="estudo.html" class="modal-link-btn">Ir para Página Dedicada</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Trabalho -->
+    <div id="modal-trabalho" class="modal-overlay" onclick="closeModal(event, 'modal-trabalho')">
+        <div class="modal-content-3d">
+            <button class="close-btn" onclick="closeModalDirect('modal-trabalho')">&times;</button>
+            <div class="modal-header">
+                <i class="fa-solid fa-briefcase modal-icon"></i>
+                <h2>Rotina de Trabalho</h2>
+            </div>
+            <div class="modal-body">
+                <h3>Tarefas Principais</h3>
+                <ul>
+                    <li><i class="fa-solid fa-check"></i> Resposta a e-mails e Daily Meeting</li>
+                    <li><i class="fa-solid fa-check"></i> Desenvolvimentos de Sprints em Andamento</li>
+                    <li><i class="fa-solid fa-check"></i> Revisão de Código e Code Reviews</li>
+                </ul>
+                <h3>Meta Diária</h3>
+                <p>Manter a taxa de conclusão de tarefas acima de 90% no prazo.</p>
+            </div>
+            <div class="modal-actions">
+                <a href="trabalho.html" class="modal-link-btn">Ir para Página Dedicada</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Lazer -->
+    <div id="modal-lazer" class="modal-overlay" onclick="closeModal(event, 'modal-lazer')">
+        <div class="modal-content-3d">
+            <button class="close-btn" onclick="closeModalDirect('modal-lazer')">&times;</button>
+            <div class="modal-header">
+                <i class="fa-solid fa-gamepad modal-icon"></i>
+                <h2>Rotina de Lazer</h2>
+            </div>
+            <div class="modal-body">
+                <h3>Atividades Programadas</h3>
+                <ul>
+                    <li><i class="fa-solid fa-check"></i> Jogos multiplayer ou campanhas solo</li>
+                    <li><i class="fa-solid fa-check"></i> Assistir séries/filmes favoritos</li>
+                    <li><i class="fa-solid fa-check"></i> Caminhada ao ar livre no fim de tarde</li>
+                </ul>
+            </div>
+            <div class="modal-actions">
+                <a href="lazer.html" class="modal-link-btn">Ir para Página Dedicada</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Hobby -->
+    <div id="modal-hobby" class="modal-overlay" onclick="closeModal(event, 'modal-hobby')">
+        <div class="modal-content-3d">
+            <button class="close-btn" onclick="closeModalDirect('modal-hobby')">&times;</button>
+            <div class="modal-header">
+                <i class="fa-solid fa-palette modal-icon"></i>
+                <h2>Rotina de Hobby</h2>
+            </div>
+            <div class="modal-body">
+                <h3>Projetos Pessoais</h3>
+                <ul>
+                    <li><i class="fa-solid fa-check"></i> Prática de instrumentos musicais</li>
+                    <li><i class="fa-solid fa-check"></i> Arte digital / modelagem 3D</li>
+                    <li><i class="fa-solid fa-check"></i> Leitura de ficção e fantasia</li>
+                </ul>
+            </div>
+            <div class="modal-actions">
+                <a href="hobby.html" class="modal-link-btn">Ir para Página Dedicada</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Embutido -->
+    <script>
+        // Funções para controle do Modal
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if(modal) {
+                modal.classList.add('active');
+            }
+        }
+
+        function closeModal(event, id) {
+            if(event.target.classList.contains('modal-overlay')) {
+                const modal = document.getElementById(id);
+                if(modal) modal.classList.remove('active');
+            }
+        }
+
+        function closeModalDirect(id) {
+            const modal = document.getElementById(id);
+            if(modal) modal.classList.remove('active');
+        }
+
+        // Efeito Tilt 3D nos Cards com movimento do mouse
+        document.querySelectorAll('.card-3d').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = ((y - centerY) / centerY) * -12;
+                const rotateY = ((x - centerX) / centerX) * 12;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)`;
+            });
+        });
+    </script>
+</body>
+</html>
